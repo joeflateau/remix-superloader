@@ -53,7 +53,7 @@ export const defaultMappedTypes: MappedType<any, any>[] = [
 type PlainObject<T extends Record<string, unknown>> = T;
 
 export function createSuperLoader<T extends Record<string, unknown>>(
-  loader: (args?: DataFunctionArgs) => Promise<T>,
+  loader: (args: DataFunctionArgs) => Promise<T>,
   mappedTypes = defaultMappedTypes
 ) {
   function toSuper(value: T): PlainObject<T> {
@@ -85,7 +85,7 @@ export function createSuperLoader<T extends Record<string, unknown>>(
   }
 
   const wrappedLoader = Object.assign(
-    async (args?: DataFunctionArgs) => {
+    async (args: DataFunctionArgs) => {
       const value = await loader(args);
       return toSuper(value);
     },

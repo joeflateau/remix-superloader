@@ -14,7 +14,7 @@ describe('to/fromSuper', () => {
       null: null,
     }));
 
-    const asSuper = loader.toSuper(await loader());
+    const asSuper = loader.toSuper(await loader(null!));
 
     expect(asSuper.date).toHaveProperty(
       '$rsl$Date',
@@ -57,7 +57,7 @@ describe('to/fromSuper', () => {
       ]
     );
 
-    const asSuper = loader.toSuper(await loader());
+    const asSuper = loader.toSuper(await loader(null!));
 
     expect(asSuper.date).toHaveProperty('$rsl$Date', 0);
 
