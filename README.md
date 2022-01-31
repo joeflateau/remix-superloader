@@ -1,6 +1,6 @@
 # remix-superloader
 
-Without **remix-superloader**, when you use loaded data with [remix](https://remix.run/)'s  `useLoaderData` hook, Date objects (and others) will be strings rather than Date objects due to JSON serialization. You must be sure to parse those back into dates. **remix-superloader** handles parsing/serializing Dates (and Maps, Sets, BigInts, RegExps) so you don't have to think about that.
+Without **remix-superloader**, when you use loaded data with [remix](https://remix.run/)'s `useLoaderData` hook, Date objects (and others) will be strings rather than Date objects due to JSON serialization. You must be sure to parse those back into dates. **remix-superloader** handles parsing/serializing Dates (and Maps, Sets, BigInts, RegExps) so you don't have to think about that.
 
 ## Installation
 
@@ -25,8 +25,7 @@ export const loader = createSuperLoader(
 );
 
 export default function Post() {
-  // we pass a ref to the loader here so useSuperLoaderData can infer types from the loader function
-  const { post } = useSuperLoaderData(loader);
+  const { post } = loader.useSuperLoaderData();
 
   return (
     <div>
@@ -50,3 +49,22 @@ export default function Post() {
 - ✅ BigInt
 - 🚫 Error
 - 🚫 undefined
+
+## Advanced: Custom Types
+
+You can customize the type converters by including a list of type (de)serializers.
+
+```tsx
+createSuperLoader(
+  async () => ({
+    date: new Date(),
+  }),
+  [
+    mapType(
+      Date, // ⬅️ type for `X instanceof type` check or string for `typeof X === type` check
+      (date) => date.getTime(), // ⬅️ to json representation
+      (timestamp) => new Date(timestamp), // ⬅️ from json representation
+    ),
+  ]
+);
+```
