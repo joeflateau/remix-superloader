@@ -10,6 +10,9 @@
     "dist",
     "src"
   ],
+  "repository": {
+    "url": "https://github.com/joeflateau/remix-superloader"
+  },
   "scripts": {
     "analyze": "size-limit --why",
     "build": "dts build",
