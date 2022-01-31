@@ -1,10 +1,10 @@
 {
-  "name": "remix-super-loader",
+  "name": "remix-superloader",
   "version": "0.1.0",
   "license": "MIT",
   "author": "Joe Flateau",
   "main": "dist/index.js",
-  "module": "dist/remix-super-loader.esm.js",
+  "module": "dist/remix-superloader.esm.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist",
@@ -41,11 +41,11 @@
   },
   "size-limit": [
     {
-      "path": "dist/remix-super-loader.cjs.production.min.js",
+      "path": "dist/remix-superloader.cjs.production.min.js",
       "limit": "10 KB"
     },
     {
-      "path": "dist/remix-super-loader.esm.js",
+      "path": "dist/remix-superloader.esm.js",
       "limit": "10 KB"
     }
   ],
