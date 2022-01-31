@@ -1,4 +1,5 @@
 import { useLoaderData } from '@remix-run/react';
+import { DataFunctionArgs } from '@remix-run/server-runtime';
 import { cloneDeepWith } from 'lodash';
 
 function typeMap<TSuper, TPlain>(
@@ -61,15 +62,17 @@ export function fromSuper<T extends Record<string, unknown>>(
   });
 }
 
-export async function defineSuperLoader<T extends Record<string, unknown>>(
-  loader: () => Promise<T>
-): Promise<SuperObject<T>> {
-  const value = await loader();
-  return toSuper(value);
+export function defineSuperLoader<T extends Record<string, unknown>>(
+  loader: (args: DataFunctionArgs) => Promise<T>
+): (args: DataFunctionArgs) => Promise<SuperObject<T>> {
+  return async (args: DataFunctionArgs) => {
+    const value = await loader(args);
+    return toSuper(value);
+  };
 }
 
 export function useSuperLoaderData<T extends Record<string, unknown>>(
-  loader: () => SuperObject<T>
+  loader: (args: DataFunctionArgs) => Promise<SuperObject<T>>
 ): PlainObject<T> {
   const loaderData = useLoaderData();
   return fromSuper(loaderData);
