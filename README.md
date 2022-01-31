@@ -32,7 +32,7 @@ export default function Post() {
     <div>
       <h2>{post.title}</h2>
       <!-- without super loader, post.date is a ISO8601 format date string
-           with super loaer, post.date is a real Date object -->
+           with super loader, post.date is a real Date object -->
       <p>{post.date.toLocaleDateString()}</p>
     </div>
   );
