@@ -62,7 +62,7 @@ export function fromSuper<T extends Record<string, unknown>>(
   });
 }
 
-export function defineSuperLoader<T extends Record<string, unknown>>(
+export function createSuperLoader<T extends Record<string, unknown>>(
   loader: (args: DataFunctionArgs) => Promise<T>
 ): (args: DataFunctionArgs) => Promise<SuperObject<T>> {
   return async (args: DataFunctionArgs) => {
