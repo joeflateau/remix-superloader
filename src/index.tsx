@@ -1,6 +1,6 @@
 import { useLoaderData } from '@remix-run/react';
 import { DataFunctionArgs } from '@remix-run/server-runtime';
-import { cloneDeepWith } from 'lodash';
+import { cloneDeepWith } from 'lodash-es';
 
 function typeMap<TSuper, TPlain>(
   type: new (...args: any[]) => TSuper,

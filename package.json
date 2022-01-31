@@ -56,19 +56,19 @@
     "@size-limit/preset-small-lib": "^7.0.5",
     "@tsconfig/create-react-app": "^1.0.2",
     "@tsconfig/recommended": "^1.0.1",
-    "@types/lodash": "^4.14.178",
+    "@types/lodash-es": "^4.17.5",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
     "dts-cli": "^1.2.0",
     "husky": "^7.0.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "release-it": "^14.12.4",
     "size-limit": "^7.0.5",
     "tslib": "^2.3.1",
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "lodash": "^4.17.21",
-    "release-it": "^14.12.4"
+    "lodash-es": "^4.17.21"
   }
 }
