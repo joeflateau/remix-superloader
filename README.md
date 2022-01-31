@@ -1,6 +1,6 @@
 # remix-superloader
 
-Without **remix-superloader**, when you use loaded data with [remix](https://remix.run/)'s  `useLoaderData` hook, Date objects (and others) will be strings rather than Date objects due to JSON serialization. You must be sure to parse those back into dates. **remix-superloader** handles parsing/serializing Dates (and RegExps) so you don't have to think about that.
+Without **remix-superloader**, when you use loaded data with [remix](https://remix.run/)'s  `useLoaderData` hook, Date objects (and others) will be strings rather than Date objects due to JSON serialization. You must be sure to parse those back into dates. **remix-superloader** handles parsing/serializing Dates (and Maps, Sets, BigInts, RegExps) so you don't have to think about that.
 
 ## Installation
 
