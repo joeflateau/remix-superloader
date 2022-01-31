@@ -3,7 +3,7 @@ import { DataFunctionArgs } from '@remix-run/server-runtime';
 import { cloneDeepWith } from 'lodash';
 
 function typeMap<TSuper, TPlain>(
-  type: new (...args: any[]) => TSuper,
+  type: string | (new (...args: any[]) => TSuper),
   toString: (value: TSuper) => TPlain,
   fromString: (value: TPlain) => TSuper,
   tag: string
@@ -24,6 +24,24 @@ const types = [
     ([source, flags]) => new RegExp(source, flags),
     '$regex'
   ),
+  typeMap(
+    Map,
+    (map) => Array.from(map.entries()),
+    (entries) => new Map(entries),
+    '$map'
+  ),
+  typeMap(
+    Set,
+    (map) => Array.from(map.values()),
+    (entries) => new Set(entries),
+    '$set'
+  ),
+  typeMap(
+    'bigint',
+    (bigint: bigint) => bigint.toString(),
+    (str) => BigInt(str),
+    '$bigint'
+  ),
 ];
 
 type SuperDate = {
@@ -43,7 +61,10 @@ export function toSuper<T extends Record<string, unknown>>(
 ): SuperObject<T> {
   return cloneDeepWith(value, (value) => {
     for (const { type, toString, tag } of types) {
-      if (value instanceof type) {
+      if (
+        (typeof type === 'string' && typeof value === type) ||
+        (typeof type !== 'string' && value instanceof type)
+      ) {
         return { [tag]: toString(value as any) };
       }
     }

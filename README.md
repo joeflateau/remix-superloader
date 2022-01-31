@@ -1,6 +1,6 @@
 # remix-superloader
 
-Without **remix-superloader** your remix loaders will convert Date objects to ISO Strings and you must be sure to parse those back into dates. **remix-superloader** handles parsing/serializing dates (and regexs) for your remix data loader so you don't have to think about that.
+Without **remix-superloader**, when you use loaded data with [remix](https://remix.run/)'s  `useLoaderData` hook, Date objects (and others) will be strings rather than Date objects due to JSON serialization. You must be sure to parse those back into dates. **remix-superloader** handles parsing/serializing Dates (and RegExps) so you don't have to think about that.
 
 ## Installation
 
@@ -25,14 +25,28 @@ export const loader = createSuperLoader(
 );
 
 export default function Post() {
+  // we pass a ref to the loader here so useSuperLoaderData can infer types from the loader function
   const { post } = useSuperLoaderData(loader);
 
   return (
     <div>
       <h2>{post.title}</h2>
-      <!-- post.date is a real Date object -->
+      <!-- without super loader, post.date is a ISO8601 format date string
+           with super loaer, post.date is a real Date object -->
       <p>{post.date.toLocaleDateString()}</p>
     </div>
   );
 }
 ```
+
+## Supported types
+
+**remix-superloader** will convert these types that are not able to be represented in standard json for you.
+
+- ✅ Date
+- ✅ RegExp
+- ✅ Map
+- ✅ Set
+- ✅ BigInt
+- 🚫 Error
+- 🚫 undefined
