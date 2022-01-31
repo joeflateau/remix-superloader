@@ -55,7 +55,7 @@ export function fromSuper<T extends Record<string, unknown>>(
 ): PlainObject<T> {
   return cloneDeepWith(value, (value) => {
     for (const { fromString, tag } of types) {
-      if (typeof value === 'object' && tag in value) {
+      if (value != null && typeof value === 'object' && tag in value) {
         return fromString(value[tag]);
       }
     }
