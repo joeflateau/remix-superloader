@@ -1,6 +1,6 @@
 # remix-superloader
 
-Without **remix-superloader**, when you use loaded data with [remix](https://remix.run/)'s `useLoaderData` hook, Date objects (and others) will be strings rather than Date objects due to JSON serialization. You must be sure to parse those back into dates. **remix-superloader** handles parsing/serializing Dates (and Maps, Sets, BigInts, RegExps) so you don't have to think about that.
+Without **remix-superloader**, when you use loaded data with [remix](https://remix.run/)'s `useLoaderData` hook, Date objects (and others) will be strings rather than Date objects due to JSON serialization. You must be sure to parse those back into dates. **remix-superloader** handles parsing/serializing Dates (and Maps, Sets, BigInts, RegExps) so you don't have to think about that. **remix-superloader** also handles inferring types for the `useSuperLoaderData` hook is automatically properly typed.
 
 ## Installation
 
@@ -11,7 +11,7 @@ npm i remix-superloader
 ## Usage
 
 ```tsx
-import { createSuperLoader, useSuperLoaderData } from 'remix-superloader';
+import { createSuperLoader } from 'remix-superloader';
 
 export const loader = createSuperLoader(
   async ({ params }: { params: { slug?: string } }) => {
@@ -55,6 +55,8 @@ export default function Post() {
 You can customize the type converters by including a list of type (de)serializers.
 
 ```tsx
+import { createSuperLoader, mapType } from 'remix-superloader';
+
 createSuperLoader(
   async () => ({
     date: new Date(),
