@@ -1,10 +1,8 @@
 import { createSuperLoader, mapType } from '../src/index';
 
 describe('to/fromSuper', () => {
-  it('converts json-unrepresentable values back and forth', () => {
-    const { toSuper, fromSuper } = createSuperLoader(async () => ({}));
-
-    const asSuper = toSuper({
+  it('converts json-unrepresentable values back and forth', async () => {
+    const loader = createSuperLoader(async () => ({
       date: new Date(0),
       regex: /foo/i,
       set: new Set(['foo', 'bar']),
@@ -14,7 +12,9 @@ describe('to/fromSuper', () => {
       ]),
       bigint: BigInt(123),
       null: null,
-    });
+    }));
+
+    const asSuper = loader.toSuper(await loader());
 
     expect(asSuper.date).toHaveProperty(
       '$rsl$Date',
@@ -28,7 +28,7 @@ describe('to/fromSuper', () => {
     ]);
     expect(asSuper.bigint).toHaveProperty('$rsl$bigint', '123');
 
-    const asPlain = fromSuper(asSuper);
+    const asPlain = loader.fromSuper(asSuper);
 
     expect(asPlain).toHaveProperty('date', new Date(0));
     expect(asPlain).toHaveProperty('regex', /foo/i);
@@ -43,9 +43,11 @@ describe('to/fromSuper', () => {
     expect(asPlain).toHaveProperty('bigint', BigInt(123));
   });
 
-  it('custom converters', () => {
-    const { toSuper, fromSuper } = createSuperLoader(
-      async () => ({}),
+  it('custom converters', async () => {
+    const loader = createSuperLoader(
+      async () => ({
+        date: new Date(0),
+      }),
       [
         mapType(
           Date,
@@ -55,13 +57,11 @@ describe('to/fromSuper', () => {
       ]
     );
 
-    const asSuper = toSuper({
-      date: new Date(0),
-    });
+    const asSuper = loader.toSuper(await loader());
 
     expect(asSuper.date).toHaveProperty('$rsl$Date', 0);
 
-    const asPlain = fromSuper(asSuper);
+    const asPlain = loader.fromSuper(asSuper);
 
     expect(asPlain).toHaveProperty('date', new Date(0));
   });

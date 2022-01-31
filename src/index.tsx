@@ -53,12 +53,10 @@ export const defaultMappedTypes: MappedType<any, any>[] = [
 type PlainObject<T extends Record<string, unknown>> = T;
 
 export function createSuperLoader<T extends Record<string, unknown>>(
-  loader: (args: DataFunctionArgs) => Promise<T>,
+  loader: (args?: DataFunctionArgs) => Promise<T>,
   mappedTypes = defaultMappedTypes
 ) {
-  function toSuper<T extends Record<string, unknown>>(
-    value: T
-  ): PlainObject<T> {
+  function toSuper(value: T): PlainObject<T> {
     return cloneDeepWith(value, (value) => {
       for (const { type, toString, tag } of mappedTypes) {
         if (
@@ -71,9 +69,7 @@ export function createSuperLoader<T extends Record<string, unknown>>(
     });
   }
 
-  function fromSuper<T extends Record<string, unknown>>(
-    value: PlainObject<T>
-  ): PlainObject<T> {
+  function fromSuper(value: PlainObject<T>): PlainObject<T> {
     return cloneDeepWith(value, (value) => {
       for (const { fromString, tag } of mappedTypes) {
         if (value != null && typeof value === 'object' && tag in value) {
@@ -83,15 +79,13 @@ export function createSuperLoader<T extends Record<string, unknown>>(
     });
   }
 
-  function useSuperLoaderData<
-    T extends Record<string, unknown>
-  >(): PlainObject<T> {
+  function useSuperLoaderData(): PlainObject<T> {
     const loaderData = useLoaderData();
     return fromSuper(loaderData);
   }
 
   const wrappedLoader = Object.assign(
-    async (args: DataFunctionArgs) => {
+    async (args?: DataFunctionArgs) => {
       const value = await loader(args);
       return toSuper(value);
     },
