@@ -55,17 +55,26 @@ export default function Post() {
 You can customize the type converters by including a list of type (de)serializers.
 
 ```tsx
-import { createSuperLoader, mapType } from 'remix-superloader';
+import {
+  createSuperLoader,
+  mapType,
+  defaultMappedTypes,
+} from 'remix-superloader';
 
-createSuperLoader(
+class MyClass {
+  constructor(public foo: string) {}
+}
+
+const loader = createSuperLoader(
   async () => ({
-    date: new Date(),
+    myClass: new MyClass('bar'),
   }),
   [
+    ...defaultMappedTypes,
     mapType(
-      Date, // ⬅️ type for `X instanceof type` check or string for `typeof X === type` check
-      (date) => date.getTime(), // ⬅️ to json representation
-      (timestamp) => new Date(timestamp), // ⬅️ from json representation
+      MyClass,
+      (myClass) => myClass.foo,
+      (value) => new MyClass(value)
     ),
   ]
 );

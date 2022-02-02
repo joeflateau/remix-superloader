@@ -1,4 +1,4 @@
-import { createSuperLoader, mapType } from '../src/index';
+import { createSuperLoader, defaultMappedTypes, mapType } from '../src/index';
 
 describe('to/fromSuper', () => {
   it('converts json-unrepresentable values back and forth', async () => {
@@ -64,5 +64,33 @@ describe('to/fromSuper', () => {
     const asPlain = loader.fromSuper(asSuper);
 
     expect(asPlain).toHaveProperty('date', new Date(0));
+  });
+
+  it('custom converters with default', async () => {
+    class MyClass {
+      constructor(public foo: string) {}
+    }
+
+    const loader = createSuperLoader(
+      async () => ({
+        myClass: new MyClass('bar'),
+      }),
+      [
+        ...defaultMappedTypes,
+        mapType(
+          MyClass,
+          (myClass) => myClass.foo,
+          (value) => new MyClass(value)
+        ),
+      ]
+    );
+
+    const asSuper = loader.toSuper(await loader(null!));
+
+    expect(asSuper.myClass).toHaveProperty('$rsl$MyClass', 'bar');
+
+    const asPlain = loader.fromSuper(asSuper);
+
+    expect(asPlain).toHaveProperty('myClass', new MyClass('bar'));
   });
 });
