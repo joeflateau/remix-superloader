@@ -92,7 +92,7 @@ export function encodeSuper<T extends JsonObject>(
 export function decodeSuper<T extends JsonObject>(
   value: SuperObject<T>,
   mappedTypes = defaultMappedTypes
-): UnSuperObject<T> {
+): UnSuperObject<SuperObject<T>> {
   return cloneDeepWith(value, (value) => {
     for (const { fromString, tag } of mappedTypes) {
       if (value != null && typeof value === 'object' && tag in value) {
