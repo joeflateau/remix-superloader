@@ -19,7 +19,7 @@ type MappedType<TSuper, TPlain> = {
 
 const supertag = Symbol('supertag');
 
-type PlainObject<T extends JsonObject> = T & { [supertag]: true };
+type SuperObject<T extends JsonObject> = T & { [supertag]: true };
 
 type LoaderFunction<T extends JsonObject> = (
   args: DataFunctionArgs
@@ -74,7 +74,7 @@ export const defaultMappedTypes: MappedType<any, any>[] = [
 export function encodeSuper<T extends JsonObject>(
   value: T,
   mappedTypes = defaultMappedTypes
-): PlainObject<T> {
+): SuperObject<T> {
   return cloneDeepWith(value, (value) => {
     for (const { type, toString, tag } of mappedTypes) {
       if (
@@ -88,9 +88,9 @@ export function encodeSuper<T extends JsonObject>(
 }
 
 export function decodeSuper<T extends JsonObject>(
-  value: PlainObject<T>,
+  value: SuperObject<T>,
   mappedTypes = defaultMappedTypes
-): PlainObject<T> {
+): SuperObject<T> {
   return cloneDeepWith(value, (value) => {
     for (const { fromString, tag } of mappedTypes) {
       if (value != null && typeof value === 'object' && tag in value) {
@@ -100,9 +100,9 @@ export function decodeSuper<T extends JsonObject>(
   });
 }
 
-export function useSuperLoaderData<TLoader extends LoaderFunction<JsonObject>>(
-  mappedTypes = defaultMappedTypes
-): PlainObject<AsyncResult<TLoader>> {
-  const loaderData = useLoaderData();
+export function useSuperLoaderData<
+  TLoader extends LoaderFunction<SuperObject<JsonObject>>
+>(mappedTypes = defaultMappedTypes): AsyncResult<TLoader> {
+  const loaderData = useLoaderData<AsyncResult<TLoader>>();
   return decodeSuper(loaderData, mappedTypes);
 }
