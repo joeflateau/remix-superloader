@@ -54,9 +54,14 @@ export default function Post() {
 You can customize the type converters by including a list of type (de)serializers.
 
 ```tsx
-import { encodeSuper, mapType, defaultMappedTypes } from 'remix-superloader';
+import {
+  encodeSuper,
+  mapType,
+  defaultMappedTypes,
+  useSuperLoaderData,
+} from 'remix-superloader';
 
-class MyClass {
+class Greeter {
   constructor(public name: string) {}
 
   greet() {
@@ -67,26 +72,26 @@ class MyClass {
 const customMappedTypes = [
   ...defaultMappedTypes,
   mapType(
-    MyClass,
-    (myInstance) => myInstance.foo,
-    (value) => new MyClass(value)
+    Greeter,
+    (greeter) => greeter.name,
+    (name) => new Greeter(name)
   ),
 ];
 
 const loader = async () =>
   encodeSuper(
     {
-      myInstance: new MyClass('bar'),
+      greeter: new Greeter('Joe'),
     },
     customMappedTypes
   );
 
 export default function Post() {
-  const { myInstance } = useSuperLoaderData<typeof loader>(customMappedTypes);
+  const { greeter } = useSuperLoaderData<typeof loader>(customMappedTypes);
 
   return (
     <div>
-      <h2>{myInstance.greet()}</h2>
+      <h2>{greeter.greet()}</h2>
     </div>
   );
 }
