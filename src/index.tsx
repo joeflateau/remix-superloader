@@ -9,7 +9,17 @@ type MappedType<TSuper, TPlain> = {
   tag: string;
 };
 
-type PlainObject<T extends JsonObject> = T;
+/*
+ * This tag is not actually assigned anywhere, it just helps Typescript tell us if we forgot to
+ * call encodeSuper in our loader.
+ *
+ * If we attempt to decodeSuper/useSuperLoaderData data that was loaded without encodeSuper
+ * (if we forgot to encode our loader data). *
+ */
+
+const supertag = Symbol('supertag');
+
+type PlainObject<T extends JsonObject> = T & { [supertag]: true };
 
 type LoaderFunction<T extends JsonObject> = (
   args: DataFunctionArgs
