@@ -1,14 +1,13 @@
 import {
-  createSuperLoader,
+  decodeSuper,
   defaultMappedTypes,
-  fromSuper,
+  encodeSuper,
   mapType,
-  toSuper,
 } from '../src/index';
 
 describe('to/fromSuper', () => {
   it('converts json-unrepresentable values back and forth', async () => {
-    const loader = createSuperLoader(async () => ({
+    const asSuper = encodeSuper({
       date: new Date(0),
       regex: /foo/i,
       set: new Set(['foo', 'bar']),
@@ -18,9 +17,7 @@ describe('to/fromSuper', () => {
       ]),
       bigint: BigInt(123),
       null: null,
-    }));
-
-    const asSuper = toSuper(await loader(null!));
+    });
 
     expect(asSuper.date).toHaveProperty(
       '$rsl$Date',
@@ -34,7 +31,7 @@ describe('to/fromSuper', () => {
     ]);
     expect(asSuper.bigint).toHaveProperty('$rsl$bigint', '123');
 
-    const asPlain = fromSuper(asSuper);
+    const asPlain = decodeSuper(asSuper);
 
     expect(asPlain).toHaveProperty('date', new Date(0));
     expect(asPlain).toHaveProperty('regex', /foo/i);
@@ -57,18 +54,17 @@ describe('to/fromSuper', () => {
         (timestamp) => new Date(timestamp)
       ),
     ];
-    const loader = createSuperLoader(
-      async () => ({
+
+    const asSuper = encodeSuper(
+      {
         date: new Date(0),
-      }),
+      },
       mappedTypes
     );
 
-    const asSuper = toSuper(await loader(null!), mappedTypes);
-
     expect(asSuper.date).toHaveProperty('$rsl$Date', 0);
 
-    const asPlain = fromSuper(asSuper, mappedTypes);
+    const asPlain = decodeSuper(asSuper, mappedTypes);
 
     expect(asPlain).toHaveProperty('date', new Date(0));
   });
@@ -91,18 +87,16 @@ describe('to/fromSuper', () => {
       ),
     ];
 
-    const loader = createSuperLoader(
-      async () => ({
+    const asSuper = encodeSuper(
+      {
         myClass: new MyClass('Joe'),
-      }),
+      },
       mappedTypes
     );
 
-    const asSuper = toSuper(await loader(null!), mappedTypes);
-
     expect(asSuper.myClass).toHaveProperty('$rsl$MyClass', 'Joe');
 
-    const asPlain = fromSuper(asSuper, mappedTypes);
+    const asPlain = decodeSuper(asSuper, mappedTypes);
 
     expect(asPlain).toHaveProperty('myClass', new MyClass('Joe'));
     expect(asPlain.myClass.greet()).toEqual('Hello, Joe');

@@ -11,27 +11,26 @@ npm i remix-superloader
 ## Usage
 
 ```tsx
-import { createSuperLoader } from 'remix-superloader';
+import { useSuperLoaderData, encodeSuper } from 'remix-superloader';
 
-export const loader = createSuperLoader(
-  async ({ params }: { params: { slug?: string } }) => {
-    return {
-      post: {
-        title: "My first Post",
-        date: new Date()
-      }
-    };
-  }
-);
+export const loader = async ({ params }: { params: { slug?: string } }) =>
+  encodeSuper({
+    post: {
+      title: 'My first Post',
+      date: new Date(),
+      slug: params.slug,
+    },
+  });
 
 export default function Post() {
   const { post } = useSuperLoaderData<typeof loader>();
 
+  // without superloader, post.date is a string
+  // with superloader, post.date is a Date
+
   return (
     <div>
       <h2>{post.title}</h2>
-      <!-- without super loader, post.date is a ISO8601 format date string
-           with super loader, post.date is a real Date object -->
       <p>{post.date.toLocaleDateString()}</p>
     </div>
   );
@@ -55,11 +54,7 @@ export default function Post() {
 You can customize the type converters by including a list of type (de)serializers.
 
 ```tsx
-import {
-  createSuperLoader,
-  mapType,
-  defaultMappedTypes,
-} from 'remix-superloader';
+import { encodeSuper, mapType, defaultMappedTypes } from 'remix-superloader';
 
 class MyClass {
   constructor(public name: string) {}
@@ -78,12 +73,13 @@ const customMappedTypes = [
   ),
 ];
 
-const loader = createSuperLoader(
-  async () => ({
-    myInstance: new MyClass('bar'),
-  }),
-  customMappedTypes
-);
+const loader = async () =>
+  encodeSuper(
+    {
+      myInstance: new MyClass('bar'),
+    },
+    customMappedTypes
+  );
 
 export default function Post() {
   const { myInstance } = useSuperLoaderData<typeof loader>(customMappedTypes);

@@ -61,7 +61,7 @@ export const defaultMappedTypes: MappedType<any, any>[] = [
   ),
 ];
 
-export function toSuper<T extends JsonObject>(
+export function encodeSuper<T extends JsonObject>(
   value: T,
   mappedTypes = defaultMappedTypes
 ): PlainObject<T> {
@@ -77,7 +77,7 @@ export function toSuper<T extends JsonObject>(
   });
 }
 
-export function fromSuper<T extends JsonObject>(
+export function decodeSuper<T extends JsonObject>(
   value: PlainObject<T>,
   mappedTypes = defaultMappedTypes
 ): PlainObject<T> {
@@ -94,15 +94,5 @@ export function useSuperLoaderData<TLoader extends LoaderFunction<JsonObject>>(
   mappedTypes = defaultMappedTypes
 ): PlainObject<AsyncResult<TLoader>> {
   const loaderData = useLoaderData();
-  return fromSuper(loaderData, mappedTypes);
-}
-
-export function createSuperLoader<T extends JsonObject>(
-  loader: LoaderFunction<T>,
-  mappedTypes = defaultMappedTypes
-) {
-  return async (args: DataFunctionArgs) => {
-    const value = await loader(args);
-    return toSuper(value, mappedTypes);
-  };
+  return decodeSuper(loaderData, mappedTypes);
 }
