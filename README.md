@@ -25,7 +25,7 @@ export const loader = createSuperLoader(
 );
 
 export default function Post() {
-  const { post } = loader.useSuperLoaderData();
+  const { post } = useSuperLoaderData<typeof loader>();
 
   return (
     <div>
@@ -62,20 +62,36 @@ import {
 } from 'remix-superloader';
 
 class MyClass {
-  constructor(public foo: string) {}
+  constructor(public name: string) {}
+
+  greet() {
+    return `Hello, ${this.name}`;
+  }
 }
+
+const customMappedTypes = [
+  ...defaultMappedTypes,
+  mapType(
+    MyClass,
+    (myInstance) => myInstance.foo,
+    (value) => new MyClass(value)
+  ),
+];
 
 const loader = createSuperLoader(
   async () => ({
-    myClass: new MyClass('bar'),
+    myInstance: new MyClass('bar'),
   }),
-  [
-    ...defaultMappedTypes,
-    mapType(
-      MyClass,
-      (myClass) => myClass.foo,
-      (value) => new MyClass(value)
-    ),
-  ]
+  customMappedTypes
 );
+
+export default function Post() {
+  const { myInstance } = useSuperLoaderData<typeof loader>(customMappedTypes);
+
+  return (
+    <div>
+      <h2>{myInstance.greet()}</h2>
+    </div>
+  );
+}
 ```

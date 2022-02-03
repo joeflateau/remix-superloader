@@ -1,4 +1,10 @@
-import { createSuperLoader, defaultMappedTypes, mapType } from '../src/index';
+import {
+  createSuperLoader,
+  defaultMappedTypes,
+  fromSuper,
+  mapType,
+  toSuper,
+} from '../src/index';
 
 describe('to/fromSuper', () => {
   it('converts json-unrepresentable values back and forth', async () => {
@@ -14,7 +20,7 @@ describe('to/fromSuper', () => {
       null: null,
     }));
 
-    const asSuper = loader.toSuper(await loader(null!));
+    const asSuper = toSuper(await loader(null!));
 
     expect(asSuper.date).toHaveProperty(
       '$rsl$Date',
@@ -28,7 +34,7 @@ describe('to/fromSuper', () => {
     ]);
     expect(asSuper.bigint).toHaveProperty('$rsl$bigint', '123');
 
-    const asPlain = loader.fromSuper(asSuper);
+    const asPlain = fromSuper(asSuper);
 
     expect(asPlain).toHaveProperty('date', new Date(0));
     expect(asPlain).toHaveProperty('regex', /foo/i);
@@ -44,53 +50,61 @@ describe('to/fromSuper', () => {
   });
 
   it('custom converters', async () => {
+    const mappedTypes = [
+      mapType(
+        Date,
+        (date) => date.getTime(),
+        (timestamp) => new Date(timestamp)
+      ),
+    ];
     const loader = createSuperLoader(
       async () => ({
         date: new Date(0),
       }),
-      [
-        mapType(
-          Date,
-          (date) => date.getTime(),
-          (timestamp) => new Date(timestamp)
-        ),
-      ]
+      mappedTypes
     );
 
-    const asSuper = loader.toSuper(await loader(null!));
+    const asSuper = toSuper(await loader(null!), mappedTypes);
 
     expect(asSuper.date).toHaveProperty('$rsl$Date', 0);
 
-    const asPlain = loader.fromSuper(asSuper);
+    const asPlain = fromSuper(asSuper, mappedTypes);
 
     expect(asPlain).toHaveProperty('date', new Date(0));
   });
 
   it('custom converters with default', async () => {
     class MyClass {
-      constructor(public foo: string) {}
+      constructor(public name: string) {}
+
+      greet() {
+        return `Hello, ${this.name}`;
+      }
     }
+
+    const mappedTypes = [
+      ...defaultMappedTypes,
+      mapType(
+        MyClass,
+        (myClass) => myClass.name,
+        (value) => new MyClass(value)
+      ),
+    ];
 
     const loader = createSuperLoader(
       async () => ({
-        myClass: new MyClass('bar'),
+        myClass: new MyClass('Joe'),
       }),
-      [
-        ...defaultMappedTypes,
-        mapType(
-          MyClass,
-          (myClass) => myClass.foo,
-          (value) => new MyClass(value)
-        ),
-      ]
+      mappedTypes
     );
 
-    const asSuper = loader.toSuper(await loader(null!));
+    const asSuper = toSuper(await loader(null!), mappedTypes);
 
-    expect(asSuper.myClass).toHaveProperty('$rsl$MyClass', 'bar');
+    expect(asSuper.myClass).toHaveProperty('$rsl$MyClass', 'Joe');
 
-    const asPlain = loader.fromSuper(asSuper);
+    const asPlain = fromSuper(asSuper, mappedTypes);
 
-    expect(asPlain).toHaveProperty('myClass', new MyClass('bar'));
+    expect(asPlain).toHaveProperty('myClass', new MyClass('Joe'));
+    expect(asPlain.myClass.greet()).toEqual('Hello, Joe');
   });
 });

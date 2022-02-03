@@ -9,6 +9,17 @@ type MappedType<TSuper, TPlain> = {
   tag: string;
 };
 
+type PlainObject<T extends JsonObject> = T;
+
+type LoaderFunction<T extends JsonObject> = (
+  args: DataFunctionArgs
+) => Promise<T>;
+
+type JsonObject = Record<string, unknown>;
+
+type AsyncResult<LoaderFn extends (...args: any[]) => Promise<any>> =
+  LoaderFn extends (...args: any[]) => Promise<infer R> ? R : never;
+
 export function mapType<TSuper, TPlain>(
   type: string | (new (...args: any[]) => TSuper),
   toString: (value: TSuper) => TPlain,
@@ -50,46 +61,48 @@ export const defaultMappedTypes: MappedType<any, any>[] = [
   ),
 ];
 
-type PlainObject<T extends Record<string, unknown>> = T;
+export function toSuper<T extends JsonObject>(
+  value: T,
+  mappedTypes = defaultMappedTypes
+): PlainObject<T> {
+  return cloneDeepWith(value, (value) => {
+    for (const { type, toString, tag } of mappedTypes) {
+      if (
+        (typeof type === 'string' && typeof value === type) ||
+        (typeof type !== 'string' && value instanceof type)
+      ) {
+        return { [tag]: toString(value as any) };
+      }
+    }
+  });
+}
 
-export function createSuperLoader<T extends Record<string, unknown>>(
-  loader: (args: DataFunctionArgs) => Promise<T>,
+export function fromSuper<T extends JsonObject>(
+  value: PlainObject<T>,
+  mappedTypes = defaultMappedTypes
+): PlainObject<T> {
+  return cloneDeepWith(value, (value) => {
+    for (const { fromString, tag } of mappedTypes) {
+      if (value != null && typeof value === 'object' && tag in value) {
+        return fromString(value[tag]);
+      }
+    }
+  });
+}
+
+export function useSuperLoaderData<TLoader extends LoaderFunction<JsonObject>>(
+  mappedTypes = defaultMappedTypes
+): PlainObject<AsyncResult<TLoader>> {
+  const loaderData = useLoaderData();
+  return fromSuper(loaderData, mappedTypes);
+}
+
+export function createSuperLoader<T extends JsonObject>(
+  loader: LoaderFunction<T>,
   mappedTypes = defaultMappedTypes
 ) {
-  function toSuper(value: T): PlainObject<T> {
-    return cloneDeepWith(value, (value) => {
-      for (const { type, toString, tag } of mappedTypes) {
-        if (
-          (typeof type === 'string' && typeof value === type) ||
-          (typeof type !== 'string' && value instanceof type)
-        ) {
-          return { [tag]: toString(value as any) };
-        }
-      }
-    });
-  }
-
-  function fromSuper(value: PlainObject<T>): PlainObject<T> {
-    return cloneDeepWith(value, (value) => {
-      for (const { fromString, tag } of mappedTypes) {
-        if (value != null && typeof value === 'object' && tag in value) {
-          return fromString(value[tag]);
-        }
-      }
-    });
-  }
-
-  function useSuperLoaderData(): PlainObject<T> {
-    const loaderData = useLoaderData();
-    return fromSuper(loaderData);
-  }
-
-  const wrappedLoader = Object.assign(
-    async (args: DataFunctionArgs) => {
-      const value = await loader(args);
-      return toSuper(value);
-    },
-    { toSuper, fromSuper, useSuperLoaderData }
-  );
-  return wrappedLoader;
+  return async (args: DataFunctionArgs) => {
+    const value = await loader(args);
+    return toSuper(value, mappedTypes);
+  };
 }
