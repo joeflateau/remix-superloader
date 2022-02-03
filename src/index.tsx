@@ -21,6 +21,8 @@ const supertag = Symbol('supertag');
 
 type SuperObject<T extends JsonObject> = T & { [supertag]: true };
 
+type UnSuperObject<T> = T extends SuperObject<infer R> ? R : never;
+
 type LoaderFunction<T extends JsonObject> = (
   args: DataFunctionArgs
 ) => Promise<T>;
@@ -90,7 +92,7 @@ export function encodeSuper<T extends JsonObject>(
 export function decodeSuper<T extends JsonObject>(
   value: SuperObject<T>,
   mappedTypes = defaultMappedTypes
-): SuperObject<T> {
+): UnSuperObject<T> {
   return cloneDeepWith(value, (value) => {
     for (const { fromString, tag } of mappedTypes) {
       if (value != null && typeof value === 'object' && tag in value) {
@@ -102,7 +104,7 @@ export function decodeSuper<T extends JsonObject>(
 
 export function useSuperLoaderData<
   TLoader extends LoaderFunction<SuperObject<JsonObject>>
->(mappedTypes = defaultMappedTypes): AsyncResult<TLoader> {
+>(mappedTypes = defaultMappedTypes): UnSuperObject<AsyncResult<TLoader>> {
   const loaderData = useLoaderData<AsyncResult<TLoader>>();
   return decodeSuper(loaderData, mappedTypes);
 }
