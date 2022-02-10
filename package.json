@@ -59,7 +59,7 @@
     "@size-limit/preset-small-lib": "^7.0.5",
     "@tsconfig/create-react-app": "^1.0.2",
     "@tsconfig/recommended": "^1.0.1",
-    "@types/lodash-es": "^4.17.5",
+    "@types/lodash": "^4.14.178",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
     "dts-cli": "^1.2.0",
@@ -72,7 +72,6 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "lodash": "^4.17.21",
-    "lodash-es": "^4.17.21"
+    "lodash": "^4.17.21"
   }
 }

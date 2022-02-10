@@ -1,6 +1,8 @@
 import { useLoaderData } from '@remix-run/react';
-import { DataFunctionArgs } from '@remix-run/server-runtime';
+import { DataFunctionArgs, json as remixJson } from '@remix-run/server-runtime';
 import { cloneDeepWith } from 'lodash';
+import { superdata } from './superdata';
+import { supertag } from './supertag';
 
 type MappedType<TSuper, TPlain> = {
   type: string | (new (...args: any[]) => TSuper);
@@ -9,28 +11,24 @@ type MappedType<TSuper, TPlain> = {
   tag: string;
 };
 
-/*
- * This tag is not actually assigned anywhere, it just helps Typescript tell us if we forgot to
- * call encodeSuper in our loader.
- *
- * If we attempt to decodeSuper/useSuperLoaderData data that was loaded without encodeSuper
- * (if we forgot to encode our loader data). *
- */
-
-const supertag = Symbol('supertag');
+type JsonObject = Record<string, unknown>;
 
 type SuperObject<T extends JsonObject> = T & { [supertag]: true };
 
 type UnSuperObject<T> = T extends SuperObject<infer R> ? R : never;
 
-type LoaderFunction<T extends JsonObject> = (
-  args: DataFunctionArgs
-) => Promise<T>;
+type LoaderFunction<T> = (args: DataFunctionArgs) => Promise<T>;
 
-type JsonObject = Record<string, unknown>;
+/*
+ * superdata is used as a hack to preserve the Data type and not collapse into Response
+ * it's also helpful for testing as it preseves the data object
+ */
+type JsonResponse<TData> = Response & { [superdata]: TData };
 
-type AsyncResult<LoaderFn extends (...args: any[]) => Promise<any>> =
-  LoaderFn extends (...args: any[]) => Promise<infer R> ? R : never;
+type LoaderResult<LoaderFn extends (...args: any[]) => Promise<any>> =
+  LoaderFn extends (...args: any[]) => Promise<JsonResponse<infer R>>
+    ? R
+    : never;
 
 export function mapType<TSuper, TPlain>(
   type: string | (new (...args: any[]) => TSuper),
@@ -73,20 +71,31 @@ export const defaultMappedTypes: MappedType<any, any>[] = [
   ),
 ];
 
+function json<Data>(
+  data: Data,
+  init?: number | ResponseInit
+): JsonResponse<Data> {
+  return Object.assign(remixJson(data, init), { [superdata]: data });
+}
+
 export function encodeSuper<T extends JsonObject>(
   value: T,
-  mappedTypes = defaultMappedTypes
-): SuperObject<T> {
-  return cloneDeepWith(value, (value) => {
-    for (const { type, toString, tag } of mappedTypes) {
-      if (
-        (typeof type === 'string' && typeof value === type) ||
-        (typeof type !== 'string' && value instanceof type)
-      ) {
-        return { [tag]: toString(value as any) };
+  mappedTypes = defaultMappedTypes,
+  init?: number | ResponseInit
+): JsonResponse<SuperObject<T>> {
+  return json(
+    cloneDeepWith(value, (value) => {
+      for (const { type, toString, tag } of mappedTypes) {
+        if (
+          (typeof type === 'string' && typeof value === type) ||
+          (typeof type !== 'string' && value instanceof type)
+        ) {
+          return { [tag]: toString(value as any) };
+        }
       }
-    }
-  });
+    }),
+    init
+  );
 }
 
 export function decodeSuper<T extends JsonObject>(
@@ -103,8 +112,8 @@ export function decodeSuper<T extends JsonObject>(
 }
 
 export function useSuperLoaderData<
-  TLoader extends LoaderFunction<SuperObject<JsonObject>>
->(mappedTypes = defaultMappedTypes): UnSuperObject<AsyncResult<TLoader>> {
-  const loaderData = useLoaderData<AsyncResult<TLoader>>();
+  TLoader extends LoaderFunction<JsonResponse<SuperObject<JsonObject>>>
+>(mappedTypes = defaultMappedTypes): UnSuperObject<LoaderResult<TLoader>> {
+  const loaderData = useLoaderData<LoaderResult<TLoader>>();
   return decodeSuper(loaderData, mappedTypes);
 }

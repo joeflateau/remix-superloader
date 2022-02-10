@@ -49,6 +49,37 @@ export default function Post() {
 - 🚫 Error
 - 🚫 undefined
 
+## Advanced: Custom Headers
+
+You can also pass headers (and other ResponseInit data) from your loader
+
+```tsx
+import { encodeSuper, useSuperLoaderData } from 'remix-superloader';
+
+const loader = async () =>
+  encodeSuper(
+    {
+      name: 'Joe',
+    },
+    undefined,
+    {
+      headers: {
+        'My-Custom-Header': 'My Header Value',
+      },
+    }
+  );
+
+export default function Post() {
+  const { name } = useSuperLoaderData<typeof loader>();
+
+  return (
+    <div>
+      <h2>Hello, {name}</h2>
+    </div>
+  );
+}
+```
+
 ## Advanced: Custom Types
 
 You can customize the type converters by including a list of type (de)serializers.

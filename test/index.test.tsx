@@ -4,6 +4,7 @@ import {
   encodeSuper,
   mapType,
 } from '../src/index';
+import { superdata } from '../src/superdata';
 
 describe('to/fromSuper', () => {
   it('converts json-unrepresentable values back and forth', async () => {
@@ -19,19 +20,22 @@ describe('to/fromSuper', () => {
       null: null,
     });
 
-    expect(asSuper.date).toHaveProperty(
+    expect(asSuper[superdata].date).toHaveProperty(
       '$rsl$Date',
       '1970-01-01T00:00:00.000Z'
     );
-    expect(asSuper.regex).toHaveProperty('$rsl$RegExp', ['foo', 'i']);
-    expect(asSuper.set).toHaveProperty('$rsl$Set', ['foo', 'bar']);
-    expect(asSuper.map).toHaveProperty('$rsl$Map', [
+    expect(asSuper[superdata].regex).toHaveProperty('$rsl$RegExp', [
+      'foo',
+      'i',
+    ]);
+    expect(asSuper[superdata].set).toHaveProperty('$rsl$Set', ['foo', 'bar']);
+    expect(asSuper[superdata].map).toHaveProperty('$rsl$Map', [
       ['foo1', 'bar1'],
       ['foo2', 'bar2'],
     ]);
-    expect(asSuper.bigint).toHaveProperty('$rsl$bigint', '123');
+    expect(asSuper[superdata].bigint).toHaveProperty('$rsl$bigint', '123');
 
-    const asPlain = decodeSuper(asSuper);
+    const asPlain = decodeSuper(asSuper[superdata]);
 
     expect(asPlain).toHaveProperty('date', new Date(0));
     expect(asPlain).toHaveProperty('regex', /foo/i);
@@ -62,9 +66,9 @@ describe('to/fromSuper', () => {
       mappedTypes
     );
 
-    expect(asSuper.date).toHaveProperty('$rsl$Date', 0);
+    expect(asSuper[superdata].date).toHaveProperty('$rsl$Date', 0);
 
-    const asPlain = decodeSuper(asSuper, mappedTypes);
+    const asPlain = decodeSuper(asSuper[superdata], mappedTypes);
 
     expect(asPlain).toHaveProperty('date', new Date(0));
   });
@@ -94,11 +98,31 @@ describe('to/fromSuper', () => {
       mappedTypes
     );
 
-    expect(asSuper.myClass).toHaveProperty('$rsl$MyClass', 'Joe');
+    expect(asSuper[superdata].myClass).toHaveProperty('$rsl$MyClass', 'Joe');
 
-    const asPlain = decodeSuper(asSuper, mappedTypes);
+    const asPlain = decodeSuper(asSuper[superdata], mappedTypes);
 
     expect(asPlain).toHaveProperty('myClass', new MyClass('Joe'));
     expect(asPlain.myClass.greet()).toEqual('Hello, Joe');
+  });
+
+  it('json wrapper', async () => {
+    const asSuper = encodeSuper(
+      {
+        date: new Date(0),
+      },
+      undefined,
+      {
+        headers: {
+          'My-Custom-Header': 'My Header Value',
+        },
+      }
+    );
+
+    expect(asSuper[superdata].date).toHaveProperty('$rsl$Date', 0);
+
+    const asPlain = decodeSuper(asSuper[superdata]);
+
+    expect(asPlain).toHaveProperty('date', new Date(0));
   });
 });
