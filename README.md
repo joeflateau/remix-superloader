@@ -54,9 +54,13 @@ export default function Post() {
 You can also pass headers (and other ResponseInit data) from your loader
 
 ```tsx
-import { encodeSuper, useSuperLoaderData } from 'remix-superloader';
+import {
+  encodeSuper,
+  useSuperLoaderData,
+  SuperLoaderFunction,
+} from 'remix-superloader';
 
-const loader = async () =>
+const loader: SuperLoaderFunction<{ name: string }> = async () =>
   encodeSuper(
     {
       name: 'Joe',

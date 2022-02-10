@@ -17,7 +17,9 @@ type SuperObject<T extends JsonObject> = T & { [supertag]: true };
 
 type UnSuperObject<T> = T extends SuperObject<infer R> ? R : never;
 
-type LoaderFunction<T> = (args: DataFunctionArgs) => Promise<T>;
+export type SuperLoaderFunction<T extends JsonObject> = (
+  args: DataFunctionArgs
+) => Promise<JsonResponse<SuperObject<T>>>;
 
 /*
  * superdata is used as a hack to preserve the Data type and not collapse into Response
@@ -112,7 +114,7 @@ export function decodeSuper<T extends JsonObject>(
 }
 
 export function useSuperLoaderData<
-  TLoader extends LoaderFunction<JsonResponse<SuperObject<JsonObject>>>
+  TLoader extends SuperLoaderFunction<JsonObject>
 >(mappedTypes = defaultMappedTypes): UnSuperObject<LoaderResult<TLoader>> {
   const loaderData = useLoaderData<LoaderResult<TLoader>>();
   return decodeSuper(loaderData, mappedTypes);

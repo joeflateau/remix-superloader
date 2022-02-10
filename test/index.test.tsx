@@ -4,6 +4,7 @@ import {
   defaultMappedTypes,
   encodeSuper,
   mapType,
+  SuperLoaderFunction,
 } from '../src/index';
 import { superdata } from '../src/superdata';
 
@@ -107,18 +108,21 @@ describe('to/fromSuper', () => {
     expect(asPlain.myClass.greet()).toEqual('Hello, Joe');
   });
 
-  it('json wrapper', async () => {
-    const asSuper = encodeSuper(
-      {
-        date: new Date(0),
-      },
-      undefined,
-      {
-        headers: {
-          'My-Custom-Header': 'My Header Value',
+  it('json response wrapper', async () => {
+    const loader: SuperLoaderFunction<{ date: Date }> = async () =>
+      encodeSuper(
+        {
+          date: new Date(0),
         },
-      }
-    );
+        undefined,
+        {
+          headers: {
+            'My-Custom-Header': 'My Header Value',
+          },
+        }
+      );
+
+    const asSuper = await loader(null!);
 
     expect(asSuper[superdata].date).toHaveProperty(
       '$rsl$Date',
