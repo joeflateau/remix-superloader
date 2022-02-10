@@ -45,7 +45,9 @@ export function mapType<TSuper, TPlain>(
   };
 }
 
-export const defaultMappedTypes: MappedType<any, any>[] = [
+type MappedTypes = MappedType<any, any>[];
+
+export const defaultMappedTypes: MappedTypes = [
   mapType(
     Date,
     (date) => date.toISOString(),
@@ -81,10 +83,33 @@ function json<Data>(
 }
 
 export function encodeSuper<T extends JsonObject>(
+  value: T
+): JsonResponse<SuperObject<T>>;
+export function encodeSuper<T extends JsonObject>(
   value: T,
-  mappedTypes = defaultMappedTypes,
+  init: number | ResponseInit
+): JsonResponse<SuperObject<T>>;
+export function encodeSuper<T extends JsonObject>(
+  value: T,
+  mappedTypes: MappedTypes
+): JsonResponse<SuperObject<T>>;
+export function encodeSuper<T extends JsonObject>(
+  value: T,
+  mappedTypes: MappedTypes,
+  init: number | ResponseInit
+): JsonResponse<SuperObject<T>>;
+export function encodeSuper<T extends JsonObject>(
+  value: T,
+  mappedTypesOrInit?: number | ResponseInit | MappedTypes,
   init?: number | ResponseInit
 ): JsonResponse<SuperObject<T>> {
+  if (!Array.isArray(mappedTypesOrInit)) {
+    init = mappedTypesOrInit;
+    mappedTypesOrInit = undefined;
+  }
+
+  const mappedTypes = mappedTypesOrInit ?? defaultMappedTypes;
+
   return json(
     cloneDeepWith(value, (value) => {
       for (const { type, toString, tag } of mappedTypes) {

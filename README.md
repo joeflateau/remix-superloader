@@ -60,25 +60,24 @@ import {
   SuperLoaderFunction,
 } from 'remix-superloader';
 
-const loader: SuperLoaderFunction<{ name: string }> = async () =>
+const loader: SuperLoaderFunction<{ date: Date }> = async () =>
   encodeSuper(
     {
-      name: 'Joe',
+      date: new Date(),
     },
-    undefined,
     {
       headers: {
-        'My-Custom-Header': 'My Header Value',
+        'Server-Timing': serverTiming,
       },
     }
   );
 
 export default function Post() {
-  const { name } = useSuperLoaderData<typeof loader>();
+  const { date } = useSuperLoaderData<typeof loader>();
 
   return (
     <div>
-      <h2>Hello, {name}</h2>
+      <h2>Hello, {date.toLocaleString()}</h2>
     </div>
   );
 }
