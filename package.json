@@ -28,6 +28,12 @@
       "pre-commit": "dts lint"
     }
   },
+  "release-it": {
+    "before:init": [
+      "npm run lint",
+      "npm test"
+    ]
+  },
   "prettier": {
     "printWidth": 80,
     "semi": true,
