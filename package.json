@@ -29,10 +29,12 @@
     }
   },
   "release-it": {
-    "before:init": [
-      "npm run lint",
-      "npm test"
-    ]
+    "hooks": {
+      "before:init": [
+        "npm run lint",
+        "npm test"
+      ]
+    }
   },
   "prettier": {
     "printWidth": 80,
