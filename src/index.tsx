@@ -83,20 +83,13 @@ function json<Data>(
 }
 
 export function encodeSuper<T extends JsonObject>(
-  value: T
-): JsonResponse<SuperObject<T>>;
-export function encodeSuper<T extends JsonObject>(
   value: T,
   init: number | ResponseInit
 ): JsonResponse<SuperObject<T>>;
 export function encodeSuper<T extends JsonObject>(
   value: T,
-  mappedTypes: MappedTypes
-): JsonResponse<SuperObject<T>>;
-export function encodeSuper<T extends JsonObject>(
-  value: T,
-  mappedTypes: MappedTypes,
-  init: number | ResponseInit
+  mappedTypes?: MappedTypes,
+  init?: number | ResponseInit
 ): JsonResponse<SuperObject<T>>;
 export function encodeSuper<T extends JsonObject>(
   value: T,
