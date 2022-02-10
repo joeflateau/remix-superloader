@@ -54,6 +54,36 @@ export default function Post() {
 You can also pass headers (and other ResponseInit data) from your loader
 
 ```tsx
+import { encodeSuper, useSuperLoaderData } from 'remix-superloader';
+
+const loader = async () =>
+  encodeSuper(
+    {
+      date: new Date(),
+    },
+    {
+      headers: {
+        'Server-Timing': serverTiming,
+      },
+    }
+  );
+
+export default function Post() {
+  const { date } = useSuperLoaderData<typeof loader>();
+
+  return (
+    <div>
+      <h2>Hello, {date.toLocaleString()}</h2>
+    </div>
+  );
+}
+```
+
+## Advanced: LoaderFunction type
+
+remix-superloader provides a generic alternative to remix's LoaderFunction
+
+```tsx
 import {
   encodeSuper,
   useSuperLoaderData,
