@@ -4,6 +4,8 @@ import { cloneDeepWith } from 'lodash';
 import { superdata } from './superdata';
 import { supertag } from './supertag';
 
+/// <reference path="./fetch.d.ts" />
+
 type MappedType<TSuper, TPlain> = {
   type: string | (new (...args: any[]) => TSuper);
   toString: (value: TSuper) => TPlain;
