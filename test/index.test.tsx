@@ -1,3 +1,4 @@
+import 'isomorphic-fetch';
 import {
   decodeSuper,
   defaultMappedTypes,
@@ -119,7 +120,10 @@ describe('to/fromSuper', () => {
       }
     );
 
-    expect(asSuper[superdata].date).toHaveProperty('$rsl$Date', 0);
+    expect(asSuper[superdata].date).toHaveProperty(
+      '$rsl$Date',
+      '1970-01-01T00:00:00.000Z'
+    );
 
     const asPlain = decodeSuper(asSuper[superdata]);
 
