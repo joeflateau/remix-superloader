@@ -1,5 +1,8 @@
 # remix-superloader
 
+[![CI](https://github.com/joeflateau/remix-superloader/actions/workflows/main.yml/badge.svg)](https://github.com/joeflateau/remix-superloader/actions/workflows/main.yml)
+![npm](https://img.shields.io/npm/v/remix-superloader)
+
 Without **remix-superloader**, when you use loaded data with [remix](https://remix.run/)'s `useLoaderData` hook, Date objects (and others) will be strings rather than Date objects due to JSON serialization. You must be sure to parse those back into dates. **remix-superloader** handles parsing/serializing Dates (and Maps, Sets, BigInts, RegExps) so you don't have to think about that. **remix-superloader** also handles inferring types, so the `useSuperLoaderData` hook is automatically properly typed.
 
 ## Installation
