@@ -27,7 +27,7 @@ export type SuperLoaderFunction<T extends JsonObject> = (
  */
 type JsonResponse<TData> = Response & { [superdata]: TData };
 
-type LoaderResult<LoaderFn extends (...args: any[]) => Promise<any>> =
+export type LoaderResult<LoaderFn extends (...args: any[]) => Promise<any>> =
   LoaderFn extends (...args: any[]) => Promise<JsonResponse<infer R>>
     ? R
     : never;
