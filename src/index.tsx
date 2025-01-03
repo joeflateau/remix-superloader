@@ -33,15 +33,15 @@ export type LoaderResult<LoaderFn extends (...args: any[]) => Promise<any>> =
     : never;
 
 export function mapType<TSuper, TPlain>(
-  type: string | (new (...args: any[]) => TSuper),
+  tag: string,
   toString: (value: TSuper) => TPlain,
   fromString: (value: TPlain) => TSuper
 ): MappedType<TSuper, TPlain> {
   return {
-    type,
+    type: tag,
     toString,
     fromString,
-    tag: `$rsl$${typeof type === 'string' ? type : type.name}`,
+    tag: `$rsl$${tag}`,
   };
 }
 
@@ -49,23 +49,23 @@ type MappedTypes = MappedType<any, any>[];
 
 export const defaultMappedTypes: MappedTypes = [
   mapType(
-    Date,
-    (date) => date.toISOString(),
+    'Date',
+    (date: Date) => date.toISOString(),
     (str) => new Date(Date.parse(str))
   ),
   mapType(
-    RegExp,
-    (exp) => [exp.source, exp.flags],
+    'RegExp',
+    (exp: RegExp) => [exp.source, exp.flags],
     ([source, flags]) => new RegExp(source, flags)
   ),
   mapType(
-    Map,
-    (map) => Array.from(map.entries()),
+    'Map',
+    (map: Map<unknown, unknown>) => Array.from(map.entries()),
     (entries) => new Map(entries)
   ),
   mapType(
-    Set,
-    (map) => Array.from(map.values()),
+    'Set',
+    (map: Set<unknown>) => Array.from(map.values()),
     (entries) => new Set(entries)
   ),
   mapType(
