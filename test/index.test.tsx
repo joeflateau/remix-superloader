@@ -55,8 +55,8 @@ describe('to/fromSuper', () => {
   it('custom converters', async () => {
     const mappedTypes = [
       mapType(
-        Date,
-        (date) => date.getTime(),
+        'Date',
+        (date: Date) => date.getTime(),
         (timestamp) => new Date(timestamp)
       ),
     ];
@@ -87,8 +87,8 @@ describe('to/fromSuper', () => {
     const mappedTypes = [
       ...defaultMappedTypes,
       mapType(
-        MyClass,
-        (myClass) => myClass.name,
+        'MyClass',
+        (myClass: MyClass) => myClass.name,
         (value) => new MyClass(value)
       ),
     ];
