@@ -107,8 +107,11 @@ export function encodeSuper<T extends JsonObject>(
     cloneDeepWith(value, (value) => {
       for (const { type, toString, tag } of mappedTypes) {
         if (
-          (typeof type === 'string' && typeof value === type) ||
-          (typeof type !== 'string' && value instanceof type)
+          typeof value === type ||
+          (value &&
+            typeof value === 'object' &&
+            value.constructor.name === type) ||
+          Object.prototype.toString.call(value).slice(8, -1) === type
         ) {
           return { [tag]: toString(value as any) };
         }
